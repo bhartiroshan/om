@@ -79,28 +79,37 @@ then
                 # cat om-config.json | jq '.mongodProcesses[0] | .servers[0].port=28017 | .servers[1].port=27018 | .servers[2].port=27019 '
                 # Settting up the value in cluster-config.json that will be needed by the Headless Automation Agent:
                 cat cluster-config.json | jq '.processes['$i'].args2_6.net.port = $dbport' --argjson dbport "$dbport"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json | jq '.processes['$i'].args2_6.replication.replSetName = $replsetname' --arg replsetname "$replsetname"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json | jq '.processes['$i'].args2_6.storage.dbPath = $dbpath' --arg dbpath "$dbpath"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json| jq '.processes['$i'].args2_6.systemLog.path = $logpath' --arg logpath "$logpath"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json| jq '.processes['$i'].hostname = $host' --arg host "$host"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json| jq '.processes['$i'].name = $dbname' --arg dbname "$dbname"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json| jq '.processes['$i'].featureCompatibilityVersion = $fcv' --arg fcv "$fcv"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json| jq '.processes['$i'].version = $dbversion' --arg dbversion "$dbversion"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                cat cluster-config$version01.json| jq '.replicaSets[0]._id = $replsetname' --arg replsetname "$replsetname"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
-                echo $dbname
-                cat cluster-config$version01.json| jq '.replicaSets[0].members['$i'].host = $dbname' --arg dbname "$dbname"  >cluster-test-config.json
-                mv cluster-test-config.json cluster-config$version01.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json | jq '.processes['$i'].args2_6.replication.replSetName = $replsetname' --arg replsetname "$replsetname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json | jq '.processes['$i'].args2_6.storage.dbPath = $dbpath' --arg dbpath "$dbpath"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json| jq '.processes['$i'].args2_6.systemLog.path = $logpath' --arg logpath "$logpath"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json| jq '.processes['$i'].hostname = $host' --arg host "$host"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json| jq '.processes['$i'].name = $dbname' --arg dbname "$dbname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json| jq '.processes['$i'].featureCompatibilityVersion = $fcv' --arg fcv "$fcv"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json| jq '.processes['$i'].version = $dbversion' --arg dbversion "$dbversion"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+                
+                cat cluster-config.json| jq '.replicaSets[0]._id = $replsetname' --arg replsetname "$replsetname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
+
+                cat cluster-config.json| jq '.replicaSets[0].members['$i'].host = $dbname' --arg dbname "$dbname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config.json
 
             done
+        mv cluster-config.json cluster-config$version01.json
         echo "Desired cluster-config.json has been modified"
         echo "Downloading Ops Manager Achived Releases Json"
         sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
