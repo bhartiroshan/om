@@ -99,7 +99,7 @@ then
                 mv cluster-test-config.json cluster-config.json
 
             done
-        mv cluster-config.json cluster-config$version01.json
+        cp cluster-config.json cluster-config$version01.json
         echo "Desired cluster-config.json has been modified"
         echo "Downloading Ops Manager Achived Releases Json"
         sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
