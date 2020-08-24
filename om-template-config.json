@@ -1,0 +1,51 @@
+{
+    "opsManager": [
+        {
+        "version": "4.2.15",
+        "platform": "Amazon Linux",
+        "package": "tar.gz"
+        }
+    ],
+    "mongodProcesses": [
+        {
+            "servers":[
+                {
+                    "id": "Server01",
+                    "port": 27017,
+                    "replSetName": "ops-manager-db",
+                    "dbPath": "/data/node1",
+                    "logpath": "/data/node1/mongodb.log",
+                    "hostname": "ip-172-31-37-204.ap-south-1.compute.internal-test",
+                    "name": "ops-manager-db-1",
+                    "featureCompatibilityVersion": "4.2",
+                    "version": "4.2.6-ent"
+                },
+                {
+                    "id": "Server02",
+                    "port": 27018,
+                    "replSetName": "ops-manager-db",
+                    "dbPath": "/data/node2",
+                    "logpath": "/data/node2/mongodb.log",
+                    "hostname": "ip-172-31-37-204.ap-south-1.compute.internal-test",
+                    "name": "ops-manager-db-2",
+                    "featureCompatibilityVersion": "4.2",
+                    "version": "4.2.6-ent"
+                },
+                {
+                    "id": "Server03",
+                    "port": 27019,
+                    "replSetName": "ops-manager-db",
+                    "dbPath": "/data/node3",
+                    "logpath": "/data/node3/mongodb.log",
+                    "hostname": "ip-172-31-37-204.ap-south-1.compute.internal-test",
+                    "name": "ops-manager-db-3",
+                    "featureCompatibilityVersion": "4.2",
+                    "version": "4.2.6-ent"
+                }
+            ]
+        }
+    ]
+}
+    
+    
+    

@@ -1,0 +1,244 @@
+#!/bin/bash
+
+#Pre-requisite create /data folder
+
+## om install --config=om-config.json --platform=rhel/amazon\ (Working)
+## om list --available-versions # To list available versions (Working)
+## om list --available-platforms --version=4.2# To list availble platforms (Working)
+## om install --requirements --platform=[Amazon/Redhat/SUSE/Centos/Ubuntu/Debian]
+## om list --installed-versions # To know the currently installed versions via this script (Under development)
+
+## echo $# --Total Number of Arguments
+command=$1
+echo $command
+
+#Installing jq & downloading omreleases.json
+#yum install -y jq
+#sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
+#cat om-template-config.json | jq '.mongodProcesses[].servers[0,1,2].hostname = $host' --arg host "$(hostname -f)" >om-config.json
+
+if [[ "$command" == "install" ]] 
+then
+    echo "The commadn is --> $command"   
+
+    for options in "$@"
+        do
+        
+            key=`echo $options | cut -d '=' -f1`
+            value=`echo $options | cut -d '=' -f2`
+
+            case $key in
+            "--config")
+            configpath="$value"
+            ;;
+            "--requirements")
+            requirements="true"
+            ;;
+            "--platform")
+            platform="$value"
+            ;;
+            esac
+
+        done
+    if [[ $requirements == "true" ]]
+    then
+        `cat requirements.json | jq -r '.builds[] | select(.platform | contains("'$platform'")) | .command'`
+    else
+        echo "The config file is $configpath"
+        echo "#############################"
+        echo "#Running some pre-checks....#"
+        echo "#############################"
+        mkdir /var/log/mongodb-mms-automation
+
+        version=$(cat $configpath | jq  .opsManager[].version)
+        version01=$(cat $configpath | jq -r .opsManager[].version)
+        package=$(cat $configpath | jq  .opsManager[].package)
+        platform=$(cat $configpath | jq  .opsManager[].platform)
+
+        hostscount=$(jq -r '.processes[].hostname' cluster-config.json | wc -l)
+        cp cluster-config.json cluster-config-backup.json
+        for ((i=0; i<$hostscount; i++));
+            do
+                dbport=`jq -r '.mongodProcesses[].servers['$i'].port' $configpath`
+                replsetname=`jq -r '.mongodProcesses[].servers['$i'].replSetName' $configpath`
+                dbpath=`jq -r '.mongodProcesses[].servers['$i'].dbPath' $configpath`
+                logpath=`jq -r '.mongodProcesses[].servers['$i'].logpath' $configpath`
+                host=`jq -r '.mongodProcesses[].servers['$i'].hostname' $configpath`
+                dbname=`jq -r '.mongodProcesses[].servers['$i'].name' $configpath`
+                fcv=`jq -r '.mongodProcesses[].servers['$i'].featureCompatibilityVersion' $configpath`
+                dbversion=`jq -r '.mongodProcesses[].servers['$i'].version' $configpath`
+                
+                # echo $dbport
+                # echo $replsetname
+                # echo $dbpath
+                # echo $logpath
+                # echo $host
+                # echo $dbname
+                # echo $fcv
+                # echo $dbversion
+                # cat om-config.json | jq '.mongodProcesses[0] | .servers[0].port=28017 | .servers[1].port=27018 | .servers[2].port=27019 '
+                # Settting up the value in cluster-config.json that will be needed by the Headless Automation Agent:
+                cat cluster-config.json | jq '.processes['$i'].args2_6.net.port = $dbport' --argjson dbport "$dbport"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json | jq '.processes['$i'].args2_6.replication.replSetName = $replsetname' --arg replsetname "$replsetname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json | jq '.processes['$i'].args2_6.storage.dbPath = $dbpath' --arg dbpath "$dbpath"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json| jq '.processes['$i'].args2_6.systemLog.path = $logpath' --arg logpath "$logpath"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json| jq '.processes['$i'].hostname = $host' --arg host "$host"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json| jq '.processes['$i'].name = $dbname' --arg dbname "$dbname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json| jq '.processes['$i'].featureCompatibilityVersion = $fcv' --arg fcv "$fcv"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json| jq '.processes['$i'].version = $dbversion' --arg dbversion "$dbversion"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                cat cluster-config$version01.json| jq '.replicaSets[0]._id = $replsetname' --arg replsetname "$replsetname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+                echo $dbname
+                cat cluster-config$version01.json| jq '.replicaSets[0].members['$i'].host = $dbname' --arg dbname "$dbname"  >cluster-test-config.json
+                mv cluster-test-config.json cluster-config$version01.json
+
+            done
+        echo "Desired cluster-config.json has been modified"
+        echo "Downloading Ops Manager Achived Releases Json"
+        sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
+        download_url=$(cat /opt/omreleases.json | jq -r '.currentReleases[] | select(.version | contains('$version')) | .platform[] | select(.os | contains('"$platform"')) | .packages.links[].download_link | select(. | contains('$package'))')
+
+        #Check if the desired version is in Current Releases
+        if [[ "$download_url" == "" ]]
+        then
+            download_url=$(cat /opt/omreleases.json | jq -r '.oldReleases[] | select(.version | contains('$version')) | .platform[] | select(.os | contains('"$platform"')) | .packages.links[].download_link | select(. | contains('$package'))')
+        fi
+
+        if [[ "$download_url" == "" ]]
+        then
+            echo "It appears that the version $version you are looking for doesn't exist. Below are the versions available:"
+            cat /opt/omreleases.json | jq '.currentReleases[].version | select(. | contains("4.4.","4.2.","4.3."))'
+            cat /opt/omreleases.json | jq '.oldReleases[].version | select(. | contains("4.4.","4.2.","4.3."))'
+            echo "Change the om-config.json to include correct Ops Manager Version. See you again, Thanks!"
+            echo
+        else
+            #Download Automation Agent
+            rm -rf /opt/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64.tar.gz
+            wget -P /opt/ https://cloud.mongodb.com/download/agent/automation/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64.tar.gz 
+            rm -rf /opt/mongodb-mms-automation
+            tar -xvzf /opt/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64.tar.gz --directory /opt/
+            mv /opt/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64 /opt/mongodb-mms-automation
+            mms_automation_bin=/opt/mongodb-mms-automation
+
+            #Start Automation Agent in Headless Mode:
+            echo "############################################"
+            echo "Starting Automation Agent in Headless Mode:"
+            echo "############################################"
+            $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
+            -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
+            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster cluster-config$version01.json 2>&1 > headless_agent.log &
+
+            dbport01=`jq -r '.mongodProcesses[].servers[0].port' $configpath`
+            dbport02=`jq -r '.mongodProcesses[].servers[1].port' $configpath`
+            dbport03=`jq -r '.mongodProcesses[].servers[2].port' $configpath`
+
+            mongod_count=`ss -ltnp | grep "$dbport01\|$dbport02\|$dbport03" | wc -l`
+            for ((; $mongod_count<3; ));
+                do
+                    echo "Waiting for mongod processes to be in healthy state. \
+                        Currently $mongod_count processes up. \
+                        Sleeping for 05 Seconds: Sorry!"
+                    sleep 5
+                    mongod_count=`ss -ltnp | grep "$dbport01\|$dbport02\|$dbport03" | wc -l`
+                done
+
+            version=$(cat $configpath | jq -r .opsManager[].version)
+
+            if [ $mongod_count -eq 3 ]
+            then
+                echo
+                echo "MongoDB Processes are in healthy State, preparing to download Ops Manager:"
+                echo    
+                echo "################################################"
+                echo "Download URL for Ops Manager from: $download_url"
+                echo "################################################"
+                ## Installing Ops Manager
+                file_name="mongodb-mms$version"
+                curl --output /opt/$file_name.tar.gz $download_url
+                archive_name=`echo "$download_url" | cut -d '/' -f6 | sed 's/.tar.gz//'`
+                echo "File name is $file_name"
+                echo "Download version is $version"
+                tar -xvzf /opt/$file_name.tar.gz --directory /opt/
+                rm -rf /opt/$file_name
+                mv /opt/$archive_name /opt/$file_name
+
+                mms_bin="/opt/$file_name/bin/mongodb-mms"
+                echo $mms_bin
+
+                host01=`jq -r '.mongodProcesses[].servers[0].hostname' $configpath`
+                host02=`jq -r '.mongodProcesses[].servers[1].hostname' $configpath`
+                host03=`jq -r '.mongodProcesses[].servers[2].hostname' $configpath`
+
+                connstring="mongo.mongoUri=mongodb://$host01:$dbport01,$host02:$dbport02,$host03:$dbport03/?maxPoolSize=150"
+                sed 's+mongo.mongoUri=mongodb://localhost:27017,localhost:27018,localhost:27019/?maxPoolSize=150+'$connstring'+g' conf-mms.properties >conf-mms.properties.bak
+                
+                ec2hostname=`curl http://169.254.169.254/latest/meta-data/public-hostname`
+                if [[ "$ec2hostname" == "" ]]
+                then
+                    ec2hostname=`hostname -f`
+                fi
+                echo "mms.centralUrl=http://$ec2hostname:8080" >> conf-mms.properties.bak
+                cp -f conf-mms.properties.bak "/opt/$file_name/conf/conf-mms.properties"
+                echo "###################################################################################"
+                echo "Starting Ops Manager $version from bin location $mms_bin"
+                echo "###################################################################################"
+                mkdir -p /opt/mongodb/mms/mongodb-releases/
+                echo "Create Directory: /opt/mongodb/mms/mongodb-releases/"
+                $mms_bin start
+                
+
+                echo -e "****MetaData of your Install**** \n Start Service: $mms_bin start \n Stop Service: $mms_bin stop \n AppDB Connection: $connstring \n Url to Access and Setup your Ops Manager: http://$ec2hostname:8080 \n Start your AppDB: $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
+            -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
+            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster cluster-config$version01.json 2>&1 > headless_agent.log &">$file_name.info
+                echo "Url to Access and Setup your Ops Manager: http://$ec2hostname:8080" 
+                    
+            fi
+        fi
+    fi
+else
+sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
+    if [[ "$command" == "list" ]] 
+    then
+        for options in "$@"
+            do
+            
+                key=`echo $options | cut -d '=' -f1`
+                value=`echo $options | cut -d '=' -f2`
+
+                case $key in
+                "--available-versions") 
+                showversions="true"
+                ;;
+                "--available-platforms") 
+                showplatform="true"
+                ;;
+                "--installed-versions")
+                installedversions="true"
+                ;;
+                "--version")
+                version="$value"
+                ;;
+                esac
+            done
+        if [[ $showversions == "true" ]] 
+        then
+            cat /opt/omreleases.json | jq '.currentReleases[].version | select(. | contains("4.0.","4.4.","4.2.","4.3."))'
+            cat /opt/omreleases.json | jq '.oldReleases[].version | select(. | contains("4.0.","4.4.","4.2.","4.3."))'
+        else   
+            if [[ $showplatform == "true" ]] 
+            then
+                echo $value
+                cat /opt/omreleases.json | jq '.oldReleases[] | select(.version | contains("4.0.","4.4.","4.2.","4.3.")) | [.version, .platform[].os] | select(.[] | contains("'$version'"))' 
+            fi
+        fi
+        
+    fi    
+fi

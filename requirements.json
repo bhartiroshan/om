@@ -1,0 +1,22 @@
+{  
+    "builds":[
+        {
+        "platform": "Ubuntu",
+        "command": "sudo apt-get install jq libcurl4 libgssapi-krb5-2 libldap-2.4-2 libwrap0 libsasl2-2 snmp openssl liblzma5"
+        },
+        {
+        "platform":"Redhat/Amazon/Centos",
+        "command": "sudo yum install jq cyrus-sasl cyrus-sasl-gssapi cyrus-sasl-plain krb5-libs libcurl net-snmp openldap openssl xz-libs"
+        },
+        {
+        "platform":"Debian" ,
+        "command":"sudo apt-get install jq libcurl4 libgssapi-krb5-2 libldap-2.4-2 libwrap0 libsasl2-2 snmp openssl liblzma5"
+        },
+        {
+        "platform":"SUSE",
+        "command": "sudo zypper install jq cyrus-sasl cyrus-sasl-plain cyrus-sasl-gssapi krb5 libcurl4 libldap-2_4-2 libopenssl1_1 libsensors4 libsnmp30 libwrap0"
+        }     
+    ]
+}
+
+
