@@ -2,6 +2,3 @@ Ubuntu: sudo apt-get install -y jq libcurl4 libgssapi-krb5-2 libldap-2.4-2 libwr
 Redhat/Amazon/Centos: sudo yum install -y jq cyrus-sasl cyrus-sasl-gssapi cyrus-sasl-plain krb5-libs libcurl net-snmp openldap openssl xz-libs
 Debian : sudo apt-get install -y jq libcurl4 libgssapi-krb5-2 libldap-2.4-2 libwrap0 libsasl2-2 snmp openssl liblzma5
 SUSE: sudo zypper install -y jq cyrus-sasl cyrus-sasl-plain cyrus-sasl-gssapi krb5 libcurl4 libldap-2_4-2 libopenssl1_1 libsensors4 libsnmp30 libwrap0
-
-
-
