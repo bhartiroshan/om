@@ -13,10 +13,15 @@ source ./omapis.bash
 command=$1
 echo $command
 
-#Installing jq & downloading omreleases.json
-#yum install -y jq
-#sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
-#cat om-template-config.json | jq '.mongodProcesses[].servers[0,1,2].hostname = $host' --arg host "$(hostname -f)" >om-config.json
+AUTOMATIONDIR="/var/log/mongodb-mms-automation"
+OMRELEASEDIR="/opt/mongodb"
+CONFDIR="/opt/mongodb/conf"
+MONGODRELEASES="/opt/mongodb/mms/mongodb-releases/""
+
+echo "#############################"
+echo "#Running some pre-checks....#"
+echo "#############################"
+prechecks $AUTOMATIONDIR $OMRELEASEDIR $CONFDIR $MONGODRELEASES
 
 if [[ "$command" == "install" ]] 
 then
@@ -39,17 +44,13 @@ then
             platform="$value"
             ;;
             esac
-
+            
         done
     if [[ $requirements == "true" ]]
     then
         `cat requirements.txt | grep -i $platform | cut -d ':' -f2`
     else
-        echo "The config file is $configpath"
-        echo "#############################"
-        echo "#Running some pre-checks....#"
-        echo "#############################"
-        mkdir /var/log/mongodb-mms-automation
+        echo "Reading config from $configpath"
 
         version=$(cat $configpath | jq  .opsManager[].version)
         version01=$(cat $configpath | jq -r .opsManager[].version)
@@ -100,41 +101,35 @@ then
                 mv cluster-test-config.json cluster-config.json
 
             done
-        cp cluster-config.json cluster-config$version01.json
-        echo "Desired cluster-config.json has been modified"
+        
+        cp cluster-config.json $CONFDIR/cluster-config$version01.json
+        echo "Desired cluster-config$version01.json has been modified"
         echo "Downloading Ops Manager Achived Releases Json"
-        sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
-        download_url=$(cat /opt/omreleases.json | jq -r '.currentReleases[] | select(.version | contains('$version')) | .platform[] | select(.os | contains('"$platform"')) | .packages.links[].download_link | select(. | contains('$package'))')
+        DOWNLOAD_URL=$(cat $OMRELEASEDIR/omreleases.json | jq -r '.currentReleases[] | select(.version | contains('$version')) | .platform[] | select(.os | contains('"$platform"')) | .packages.links[].download_link | select(. | contains('$package'))')
 
         #Check if the desired version is in Current Releases
-        if [[ "$download_url" == "" ]]
+        if [[ "$DOWNLOAD_URL" == "" ]]
         then
-            download_url=$(cat /opt/omreleases.json | jq -r '.oldReleases[] | select(.version | contains('$version')) | .platform[] | select(.os | contains('"$platform"')) | .packages.links[].download_link | select(. | contains('$package'))')
+            DOWNLOAD_URL=$(cat $OMRELEASEDIR/omreleases.json | jq -r '.oldReleases[] | select(.version | contains('$version')) | .platform[] | select(.os | contains('"$platform"')) | .packages.links[].download_link | select(. | contains('$package'))')
         fi
 
-        if [[ "$download_url" == "" ]]
+        if [[ "$DOWNLOAD_URL" == "" ]]
         then
             echo "It appears that the version $version you are looking for doesn't exist. Below are the versions available:"
-            cat /opt/omreleases.json | jq '.currentReleases[].version | select(. | contains("4.4.","4.2.","4.3."))'
-            cat /opt/omreleases.json | jq '.oldReleases[].version | select(. | contains("4.4.","4.2.","4.3."))'
+            cat $OMRELEASEDIR/omreleases.json | jq '.currentReleases[].version | select(. | contains("4.4.","4.2.","4.3."))'
+            cat $OMRELEASEDIR/omreleases.json | jq '.oldReleases[].version | select(. | contains("4.4.","4.2.","4.3."))'
             echo "Change the om-config.json to include correct Ops Manager Version. See you again, Thanks!"
             echo
         else
-            #Download Automation Agent
-            rm -rf /opt/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64.tar.gz
-            wget -P /opt/ https://cloud.mongodb.com/download/agent/automation/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64.tar.gz 
-            rm -rf /opt/mongodb-mms-automation
-            tar -xvzf /opt/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64.tar.gz --directory /opt/
-            mv /opt/mongodb-mms-automation-agent-10.17.0.6529-1.linux_x86_64 /opt/mongodb-mms-automation
-            mms_automation_bin=/opt/mongodb-mms-automation
 
+            mms_automation_bin=$OMRELEASEDIR/mongodb-mms-automation
             #Start Automation Agent in Headless Mode:
             echo "############################################"
             echo "Starting Automation Agent in Headless Mode:"
             echo "############################################"
             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
             -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
-            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster cluster-config$version01.json 2>&1 > headless_agent.log &
+            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &
 
             dbport01=`jq -r '.mongodProcesses[].servers[0].port' $configpath`
             dbport02=`jq -r '.mongodProcesses[].servers[1].port' $configpath`
@@ -158,36 +153,44 @@ then
                 echo "MongoDB Processes are in healthy State, preparing to download Ops Manager:"
                 echo    
                 echo "################################################"
-                echo "Download URL for Ops Manager from: $download_url"
+                echo "Download URL for Ops Manager from: $DOWNLOAD_URL"
                 echo "################################################"
                 ## Installing Ops Manager
-                file_name="mongodb-mms$version"
-                curl --output /opt/$file_name.tar.gz $download_url
-                archive_name=`echo "$download_url" | cut -d '/' -f6 | sed 's/.tar.gz//'`
-                echo "File name is $file_name"
-                echo "Download version is $version"
-                tar -xvzf /opt/$file_name.tar.gz --directory /opt/
-                rm -rf /opt/$file_name
-                mv /opt/$archive_name /opt/$file_name
+                FILE_NAME="mongodb-mms$version"  # mongodb-mms4.2.15
+                MMSFOLDER=$OMRELEASEDIR/$FILE_NAME # /opt/mongodb/mongodb-mms4.2.15
 
-                mms_bin="/opt/$file_name/bin/mongodb-mms"
-                echo $mms_bin
+                if [[ -d $MMSFOLDER ]]
+                then 
+                    echo "The require version $MMSFOLDER already exists, skipping downloading it."
+                else
+                    download_mms $DOWNLOAD_URL $MMSFOLDER
+                    MMSTAR=$MMSFOLDER.tar.gz
+                fi
+
+                #curl --output /opt/$FILE_NAME.tar.gz $DOWNLOAD_URL
+                ARCHIVE_NAME=`echo "$DOWNLOAD_URL" | cut -d '/' -f6 | sed 's/.tar.gz//'`
+                #echo "File name is $FILE_NAME"
+                #echo "Download version is $version"
+                tar -xvzf $MMSTAR --directory $OMRELEASEDIR
+                mv $OMRELEASEDIR/$ARCHIVE_NAME $MMSFOLDER
+
+                MMS_BIN="$MMSFOLDER/mongodb-mms"
 
                 host01=`jq -r '.mongodProcesses[].servers[0].hostname' $configpath`
                 host02=`jq -r '.mongodProcesses[].servers[1].hostname' $configpath`
                 host03=`jq -r '.mongodProcesses[].servers[2].hostname' $configpath`
 
-                connstring="mongo.mongoUri=mongodb://$host01:$dbport01,$host02:$dbport02,$host03:$dbport03/?maxPoolSize=150"
-                sed 's+mongo.mongoUri=mongodb://localhost:27017,localhost:27018,localhost:27019/?maxPoolSize=150+'$connstring'+g' conf-mms.properties >conf-mms.properties.bak
+                CONNSTRING="mongo.mongoUri=mongodb://$host01:$dbport01,$host02:$dbport02,$host03:$dbport03/?maxPoolSize=150"
+                sed 's+mongo.mongoUri=mongodb://localhost:27017,localhost:27018,localhost:27019/?maxPoolSize=150+'$CONNSTRING'+g' conf-mms.properties >conf-mms.properties.bak
                 
-                ec2hostname=`curl http://169.254.169.254/latest/meta-data/public-hostname`
-                if [[ "$ec2hostname" == "" ]]
+                EC2HOSTNAME=`curl http://169.254.169.254/latest/meta-data/public-hostname`
+                if [[ "$EC2HOSTNAME" == "" ]]
                 then
-                    ec2hostname=`hostname -f`
+                    EC2HOSTNAME=`hostname -f`
                 fi
                 
                 # Add conf-mms.properties values
-                echo "mms.centralUrl=http://$ec2hostname:8080" >> conf-mms.properties.bak
+                echo "mms.centralUrl=http://$EC2HOSTNAME:8080" >> conf-mms.properties.bak
                 echo "mms.ignoreInitialUiSetup=true" >> conf-mms.properties.bak
                 echo "mms.fromEmailAddr=example@example.com" >> conf-mms.properties.bak
                 echo "mms.replyToEmailAddr=example@example.com" >> conf-mms.properties.bak
@@ -196,13 +199,11 @@ then
                 echo "mms.mail.hostname=mail.example.com" >> conf-mms.properties.bak
                 echo "mms.mail.port=465" >> conf-mms.properties.bak
 
-                cp -f conf-mms.properties.bak "/opt/$file_name/conf/conf-mms.properties"
+                cp -f conf-mms.properties.bak "$MMSFOLDER/conf/conf-mms.properties"
                 echo "###################################################################################"
-                echo "Starting Ops Manager $version from bin location $mms_bin"
+                echo "Starting Ops Manager $version from bin location $MMS_BIN"
                 echo "###################################################################################"
-                mkdir -p /opt/mongodb/mms/mongodb-releases/
-                echo "Create Directory: /opt/mongodb/mms/mongodb-releases/"
-                $mms_bin start
+                $MMS_BIN start
 
                 #Creating First User:
                 login=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].login'`
@@ -216,7 +217,7 @@ then
                 # local password=$3
                 # local firstname=$4
                 # local firstname=$5
-                userapiresp=`create_user $ec2hostname $login $password $firstname $lastname`
+                userapiresp=`create_user $EC2HOSTNAME $login $password $firstname $lastname`
                 echo $userapiresp >userapiresp.log
                 error=`cat userapiresp.log | grep -i errorcode`
                 if [[ $error == "" ]]
@@ -226,10 +227,10 @@ then
                     echo "Some error occured when creating user, please check userapiresp.log"
                 fi
 
-                echo -e "****MetaData of your Install**** \n Start Service: $mms_bin start \n Stop Service: $mms_bin stop \n AppDB Connection: $connstring \n Url to Access and Setup your Ops Manager: http://$ec2hostname:8080 \n Start your AppDB: $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
+                echo -e "****MetaData of your Install**** \n Start Service: $MMS_BIN start \n Stop Service: $MMS_BIN stop \n AppDB Connection: $CONNSTRING \n Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080 \n Start your AppDB:             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
             -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
-            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster cluster-config$version01.json 2>&1 > headless_agent.log &">$file_name.info
-                echo "Url to Access and Setup your Ops Manager: http://$ec2hostname:8080" 
+            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &" >$MMSFOLDER/$FILE_NAME.info
+                echo "Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080" 
                     
             fi
         fi
@@ -261,14 +262,14 @@ sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.co
             done
         if [[ $showversions == "true" ]] 
         then
-            cat /opt/omreleases.json | jq '.currentReleases[].version | select(. | contains("4.0.","4.4.","4.2.","4.3."))'
-            cat /opt/omreleases.json | jq '.oldReleases[].version | select(. | contains("4.0.","4.4.","4.2.","4.3."))'
+            cat $OMRELEASEDIR/omreleases.json | jq '.currentReleases[].version | select(. | contains("4.0.","4.4.","4.2.","4.3."))'
+            cat $OMRELEASEDIR/omreleases.json | jq '.oldReleases[].version | select(. | contains("4.0.","4.4.","4.2.","4.3."))'
         else   
             if [[ $showplatform == "true" ]] 
             then
                 echo $value
-                cat /opt/omreleases.json | jq '.oldReleases[] | select(.version | contains("4.0.","4.4.","4.2.","4.3.")) | [.version, .platform[].os] | select(.[] | contains("'$version'"))' 
-                cat /opt/omreleases.json | jq '.oldReleases[] | select(.version | contains("4.0.","4.4.","4.2.","4.3.")) | [.version, .platform[].os] | select(.[] | contains("'$version'"))' 
+                cat $OMRELEASEDIR/omreleases.json | jq '.oldReleases[] | select(.version | contains("4.0.","4.4.","4.2.","4.3.")) | [.version, .platform[].os] | select(.[] | contains("'$version'"))' 
+                cat $OMRELEASEDIR/omreleases.json | jq '.oldReleases[] | select(.version | contains("4.0.","4.4.","4.2.","4.3.")) | [.version, .platform[].os] | select(.[] | contains("'$version'"))' 
             fi
         fi
         
