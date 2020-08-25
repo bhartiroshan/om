@@ -3,8 +3,23 @@
         {
         "version": "4.2.15",
         "platform": "Amazon Linux",
-        "package": "tar.gz"
+        "package": "tar.gz",
+        "userconfig": [
+                {
+                "firstname": "Roshan",
+                "lastname": "Bharti",
+                "login": "roshan.bharti@mongodb.com",
+                "password": "Mongodb@123"
+                }
+        ],
+        "backupdaemon": [
+                {
+                "headdb": "/opt/head",
+                "user": "mongodb-mms"
+                }
+            ]
         }
+
     ],
     "mongodProcesses": [
         {

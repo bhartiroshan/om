@@ -1,11 +1,12 @@
 #!/bin/bash
+source ./omapis.bash
 
 #Pre-requisite create /data folder
 
 ## om install --config=om-config.json --platform=rhel/amazon\ (Working)
 ## om list --available-versions # To list available versions (Working)
 ## om list --available-platforms --version=4.2# To list availble platforms (Working)
-## om install --requirements --platform=[Amazon/Redhat/SUSE/Centos/Ubuntu/Debian]
+## om install --requirements --platform=[Amazon/Redhat/SUSE/Centos/Ubuntu/Debian] (Working)
 ## om list --installed-versions # To know the currently installed versions via this script (Under development)
 
 ## echo $# --Total Number of Arguments
@@ -184,7 +185,17 @@ then
                 then
                     ec2hostname=`hostname -f`
                 fi
+                
+                # Add conf-mms.properties values
                 echo "mms.centralUrl=http://$ec2hostname:8080" >> conf-mms.properties.bak
+                echo "mms.ignoreInitialUiSetup=true" >> conf-mms.properties.bak
+                echo "mms.fromEmailAddr=example@example.com" >> conf-mms.properties.bak
+                echo "mms.replyToEmailAddr=example@example.com" >> conf-mms.properties.bak
+                echo "mms.adminEmailAddr=example@example.com" >> conf-mms.properties.bak
+                echo "mms.mail.transport=smtps" >> conf-mms.properties.bak
+                echo "mms.mail.hostname=mail.example.com" >> conf-mms.properties.bak
+                echo "mms.mail.port=465" >> conf-mms.properties.bak
+
                 cp -f conf-mms.properties.bak "/opt/$file_name/conf/conf-mms.properties"
                 echo "###################################################################################"
                 echo "Starting Ops Manager $version from bin location $mms_bin"
@@ -192,7 +203,28 @@ then
                 mkdir -p /opt/mongodb/mms/mongodb-releases/
                 echo "Create Directory: /opt/mongodb/mms/mongodb-releases/"
                 $mms_bin start
+
+                #Creating First User:
+                login=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].login'`
+                password=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].password'`
+                firstname=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].firstname'`
+                lastname=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].lastname'`
                 
+                #Calling User creation API
+                # local omhost=$1
+                # local username=$2
+                # local password=$3
+                # local firstname=$4
+                # local firstname=$5
+                userapiresp=`create_user $ec2hostname $login $password $firstname $lastname`
+                echo $userapiresp >userapiresp.log
+                error=`cat userapiresp.log | grep -i errorcode`
+                if [[ $error == "" ]]
+                then
+                    echo "User created successfully."
+                else
+                    echo "Some error occured when creating user, please check userapiresp.log"
+                fi
 
                 echo -e "****MetaData of your Install**** \n Start Service: $mms_bin start \n Stop Service: $mms_bin stop \n AppDB Connection: $connstring \n Url to Access and Setup your Ops Manager: http://$ec2hostname:8080 \n Start your AppDB: $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
             -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
