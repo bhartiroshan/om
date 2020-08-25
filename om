@@ -16,7 +16,7 @@ echo $command
 AUTOMATIONDIR="/var/log/mongodb-mms-automation"
 OMRELEASEDIR="/opt/mongodb"
 CONFDIR="/opt/mongodb/conf"
-MONGODRELEASES="/opt/mongodb/mms/mongodb-releases/""
+MONGODRELEASES="/opt/mongodb/mms/mongodb-releases/"
 
 echo "#############################"
 echo "#Running some pre-checks....#"
