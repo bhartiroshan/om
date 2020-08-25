@@ -6,10 +6,10 @@
         "package": "tar.gz",
         "userconfig": [
                 {
-                "firstname": "Roshan",
-                "lastname": "Bharti",
-                "login": "roshan.bharti@mongodb.com",
-                "password": "Mongodb@123"
+                "firstname": "Ops",
+                "lastname": "Manager",
+                "login": "testuser@om.com",
+                "password": "Opsmanager@123"
                 }
         ],
         "backupdaemon": [
