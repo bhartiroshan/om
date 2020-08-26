@@ -1,6 +1,7 @@
 {
     "opsManager": [
         {
+        "installName":"OM421",
         "version": "4.2.15",
         "platform": "Amazon Linux",
         "package": "tar.gz",

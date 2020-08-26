@@ -1,5 +1,6 @@
 #!/bin/bash
-source ./omapis.bash
+source ./scripts/omapis.bash
+source ./scripts/downloads.sh
 
 #Pre-requisite create /data folder
 
@@ -17,11 +18,6 @@ AUTOMATIONDIR="/var/log/mongodb-mms-automation"
 OMRELEASEDIR="/opt/mongodb"
 CONFDIR="/opt/mongodb/conf"
 MONGODRELEASES="/opt/mongodb/mms/mongodb-releases/"
-
-echo "#############################"
-echo "#Running some pre-checks....#"
-echo "#############################"
-prechecks $AUTOMATIONDIR $OMRELEASEDIR $CONFDIR $MONGODRELEASES
 
 if [[ "$command" == "install" ]] 
 then
@@ -50,7 +46,13 @@ then
     then
         `cat requirements.txt | grep -i $platform | cut -d ':' -f2`
     else
+
+        echo "#############################"
+        echo "#Running some pre-checks....#"
+        echo "#############################"
         echo "Reading config from $configpath"
+
+        prechecks $AUTOMATIONDIR $OMRELEASEDIR $CONFDIR $MONGODRELEASES
 
         version=$(cat $configpath | jq  .opsManager[].version)
         version01=$(cat $configpath | jq -r .opsManager[].version)
@@ -173,8 +175,9 @@ then
                 #echo "Download version is $version"
                 tar -xvzf $MMSTAR --directory $OMRELEASEDIR
                 mv $OMRELEASEDIR/$ARCHIVE_NAME $MMSFOLDER
+                rm -rf $MMSTAR
 
-                MMS_BIN="$MMSFOLDER/mongodb-mms"
+                MMS_BIN="$MMSFOLDER/bin/mongodb-mms"
 
                 host01=`jq -r '.mongodProcesses[].servers[0].hostname' $configpath`
                 host02=`jq -r '.mongodProcesses[].servers[1].hostname' $configpath`
@@ -206,10 +209,10 @@ then
                 $MMS_BIN start
 
                 #Creating First User:
-                login=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].login'`
-                password=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].password'`
-                firstname=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].firstname'`
-                lastname=`cat om-template-config.json | jq -r '.opsManager[].userconfig[].lastname'`
+                login=`cat om-config.json | jq -r '.opsManager[].userconfig[].login'`
+                password=`cat om-config.json | jq -r '.opsManager[].userconfig[].password'`
+                firstname=`cat om-config.json | jq -r '.opsManager[].userconfig[].firstname'`
+                lastname=`cat om-config.json | jq -r '.opsManager[].userconfig[].lastname'`
                 
                 #Calling User creation API
                 # local omhost=$1
@@ -217,19 +220,22 @@ then
                 # local password=$3
                 # local firstname=$4
                 # local firstname=$5
-                `create_user $EC2HOSTNAME $login $password $firstname $lastname` >userapiresp.log
-                error=`cat userapiresp.log | grep -i errorcode`
+                $(create_user $EC2HOSTNAME $login $password $firstname $lastname)>$MMSFOLDER/omapiresp.log
+                error=`cat $MMSFOLDER/userapiresp.log | grep -i errorcode`
                 if [[ $error == "" ]]
                 then
                     echo "User created successfully."
                 else
-                    echo "Some error occured when creating user, please check userapiresp.log"
+                    echo "Some error occured when creating user, please check $MMSFOLDER/userapiresp.log"
                 fi
 
                 echo -e "****MetaData of your Install**** \n Start Service: $MMS_BIN start \n Stop Service: $MMS_BIN stop \n AppDB Connection: $CONNSTRING \n Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080 \n Start your AppDB:             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
             -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
             -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &" >$MMSFOLDER/$FILE_NAME.info
+                echo
                 echo "Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080" 
+                echo
+                echo "A .info file has been placed in $MMSFOLDER folder named $FILE_NAME, it has all commands to start Application Database or Ops Manager."
                     
             fi
         fi
@@ -237,7 +243,7 @@ then
 else
     if [[ -f "$OMRELEASEDIR/omreleases.json" ]]
     then
-        echo "The file omreleases.json already exist in $OMRELEASEDIR, skip downloadint it."
+        echo "The file omreleases.json already exist in $OMRELEASEDIR, skip downloading it."
     else    
         sudo curl --output $OMRELEASEDIR/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
     fi
