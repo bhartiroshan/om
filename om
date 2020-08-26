@@ -230,6 +230,7 @@ then
                 if [[ $error == "" ]]
                 then
                     echo "User created successfully."
+                    cat $MMSFOLDER/userapiresp.log | jq '.'
                 else
                     echo "Some error occured when creating user, please check $MMSFOLDER/userapiresp.log"
                     cat $MMSFOLDER/userapiresp.log | jq '.'
@@ -259,7 +260,8 @@ else
     if [[ -f "$OMRELEASEDIR/omreleases.json" ]]
     then
         echo "The file omreleases.json already exist in $OMRELEASEDIR, skip downloading it."
-    else    
+    else  
+        mkdir -p $OMRELEASEDIR  
         sudo curl --output $OMRELEASEDIR/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
     fi
 
