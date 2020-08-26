@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./scripts/omapis.bash
+source ./scripts/omapis.sh
 source ./scripts/downloads.sh
 
 #Pre-requisite create /data folder
@@ -129,6 +129,10 @@ then
             echo "############################################"
             echo "Starting Automation Agent in Headless Mode:"
             echo "############################################"
+            MMSAUTOMATION="$mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
+            -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
+            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &"
+
             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
             -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
             -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &
@@ -167,15 +171,15 @@ then
                 else
                     download_mms $DOWNLOAD_URL $MMSFOLDER
                     MMSTAR=$MMSFOLDER.tar.gz
+
+                    ARCHIVE_NAME=`echo "$DOWNLOAD_URL" | cut -d '/' -f6 | sed 's/.tar.gz//'`
+                    tar -xvzf $MMSTAR --directory $OMRELEASEDIR
+                    mv $OMRELEASEDIR/$ARCHIVE_NAME $MMSFOLDER
+                    rm -rf $MMSTAR
+                    echo "MMSTAR $MMSTAR"
                 fi
 
-                #curl --output /opt/$FILE_NAME.tar.gz $DOWNLOAD_URL
-                ARCHIVE_NAME=`echo "$DOWNLOAD_URL" | cut -d '/' -f6 | sed 's/.tar.gz//'`
-                #echo "File name is $FILE_NAME"
-                #echo "Download version is $version"
-                tar -xvzf $MMSTAR --directory $OMRELEASEDIR
-                mv $OMRELEASEDIR/$ARCHIVE_NAME $MMSFOLDER
-                rm -rf $MMSTAR
+
 
                 MMS_BIN="$MMSFOLDER/bin/mongodb-mms"
 
@@ -209,10 +213,10 @@ then
                 $MMS_BIN start
 
                 #Creating First User:
-                login=`cat om-config.json | jq -r '.opsManager[].userconfig[].login'`
-                password=`cat om-config.json | jq -r '.opsManager[].userconfig[].password'`
-                firstname=`cat om-config.json | jq -r '.opsManager[].userconfig[].firstname'`
-                lastname=`cat om-config.json | jq -r '.opsManager[].userconfig[].lastname'`
+                login=`cat $configpath | jq -r '.opsManager[].userconfig[].login'`
+                password=`cat $configpath | jq -r '.opsManager[].userconfig[].password'`
+                firstname=`cat $configpath | jq -r '.opsManager[].userconfig[].firstname'`
+                lastname=`cat $configpath | jq -r '.opsManager[].userconfig[].lastname'`
                 
                 #Calling User creation API
                 # local omhost=$1
@@ -220,23 +224,34 @@ then
                 # local password=$3
                 # local firstname=$4
                 # local firstname=$5
-                $(create_user $EC2HOSTNAME $login $password $firstname $lastname)>$MMSFOLDER/omapiresp.log
+
+                create_user $EC2HOSTNAME $login $password $firstname $lastname >$MMSFOLDER/userapiresp.log
                 error=`cat $MMSFOLDER/userapiresp.log | grep -i errorcode`
                 if [[ $error == "" ]]
                 then
                     echo "User created successfully."
                 else
                     echo "Some error occured when creating user, please check $MMSFOLDER/userapiresp.log"
+                    cat $MMSFOLDER/userapiresp.log | jq '.'
+
                 fi
 
-                echo -e "****MetaData of your Install**** \n Start Service: $MMS_BIN start \n Stop Service: $MMS_BIN stop \n AppDB Connection: $CONNSTRING \n Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080 \n Start your AppDB:             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
-            -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
-            -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &" >$MMSFOLDER/$FILE_NAME.info
-                echo
+            #     echo -e "****MetaData of your Install**** \n Start Service: $MMS_BIN start \n Stop Service: $MMS_BIN stop \n AppDB Connection: $CONNSTRING \n Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080 \n Start your AppDB:             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
+            # -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
+            # -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &" >$MMSFOLDER/$FILE_NAME.info
                 echo "Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080" 
-                echo
-                echo "A .info file has been placed in $MMSFOLDER folder named $FILE_NAME, it has all commands to start Application Database or Ops Manager."
-                    
+ 
+                INSTALLNAME=`cat $configpath | jq -r '.opsManager[].installName'`
+
+                JSON_STRING=$( jq -n \
+                                --arg installname "$INSTALLNAME" \
+                                --arg version "$version01" \
+                                --arg mmsbin "$MMS_BIN" \
+                                --arg mmsautomation "$MMSAUTOMATION"\
+                                '{installName: $installname, version: $version, mmsbin: $mmsbin, appdb_bin: $mmsautomation}' )
+                echo $JSON_STRING >$OMRELEASEDIR/$INSTALLNAME.info
+                echo "A .info file has been placed in $OMRELEASEDIR/$INSTALLNAME.info, it has path to binaries to start Application Database or Ops Manager."
+                cat $OMRELEASEDIR/$INSTALLNAME.info | jq '.'
             fi
         fi
     fi
