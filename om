@@ -217,8 +217,7 @@ then
                 # local password=$3
                 # local firstname=$4
                 # local firstname=$5
-                userapiresp=`create_user $EC2HOSTNAME $login $password $firstname $lastname`
-                echo $userapiresp >userapiresp.log
+                `create_user $EC2HOSTNAME $login $password $firstname $lastname` >userapiresp.log
                 error=`cat userapiresp.log | grep -i errorcode`
                 if [[ $error == "" ]]
                 then
@@ -236,7 +235,13 @@ then
         fi
     fi
 else
-sudo curl --output /opt/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
+    if [[ -f "$OMRELEASEDIR/omreleases.json" ]]
+    then
+        echo "The file omreleases.json already exist in $OMRELEASEDIR, skip downloadint it."
+    else    
+        sudo curl --output $OMRELEASEDIR/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
+    fi
+
     if [[ "$command" == "list" ]] 
     then
         for options in "$@"
