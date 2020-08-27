@@ -161,7 +161,7 @@ Start Backup Daemon...                                     [  OK  ]
 
 ```
 User created successfully.
-Url to Access and Setup your Ops Manager: http://example.com:8080
+Url to Access your Ops Manager: http://example.com:8080
 A .info file has been placed in /opt/mongodb/OM4214.info, it has path to binaries to start Application Database or Ops Manager.
 {
   "installName": "OM4214",
@@ -169,8 +169,9 @@ A .info file has been placed in /opt/mongodb/OM4214.info, it has path to binarie
   "mmsbin": "/opt/mongodb/mongodb-mms4.2.14/bin/mongodb-mms",
   "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.2.14.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
 }
-
 ```
+- Please note the user creadentisl provided in om-config.json for signing in. 
+- After successful login create Organization. 
 
 ## To list available platforms
 ```
