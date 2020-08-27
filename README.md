@@ -19,6 +19,17 @@
 - git :) 
 - Make sure your repos are updated(to install other requirements)
 
+## Usage
+
+```
+sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debian/SUSE]
+                  [--config=om-config.json]
+            list  [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debian/SUSE]
+                  [--available-platforms] [--version=4.x]
+                  [--available-versions]
+ ``` 
+  
+
 ## Installation
 
 ```
