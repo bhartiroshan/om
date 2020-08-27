@@ -35,10 +35,16 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
 ```
 git clone https://github.com/bhartiroshan/om.git
 
+cd om
+```
+
+### Install requirements
+
+```
 sudo ./om install --requirements --platform=amazon ## or [redhat/suse/ubuntu/debian]
 ```
 
-## Create a config file from the template provided
+### Generate a config file from the template provided
 
 - This creates a om-config.json and updates your hostname in it. 
 
@@ -46,7 +52,7 @@ sudo ./om install --requirements --platform=amazon ## or [redhat/suse/ubuntu/deb
 cat om-template-config.json | jq '.mongodProcesses[].servers[0,1,2].hostname = $host' --arg host "$(hostname -f)" >om-config.json
 ```
 
-## Installing Ops Manager
+### Installing Ops Manager
 
 - Edit om-config.json and change any respective values(e.g. Ops Manager version/AppDB MongoDB version/Platform installing on)
 
