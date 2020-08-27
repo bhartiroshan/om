@@ -5,7 +5,7 @@
 - Install any version of Ops Manager 4.x.x
 - Install on any supported Linux Platforms
 - Creates a 3 nodes Application Database
-- No dependencies other than packages listed in requirements.txt
+- No dependencies other than MongoDB entrprise packages listed in requirements.txt
 
 ## Supported Platforms
 
