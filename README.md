@@ -183,6 +183,23 @@ A .info file has been placed in /opt/mongodb/OM4214.info, it has path to binarie
 ## To list available platforms
 ```
 sudo ./om list --available-platforms # would show for all versions
+```
+```
 sudo ./om list --available-platforms --version=4.4 #would only show for 4.4 version
+4.4
+[
+  "4.4.0",
+  "Debian 9, 10 / Ubuntu 16.04 + 18.04",
+  "Red Hat + CentOS 6, 7, 8 / SUSE 12 + 15 / Amazon Linux 2",
+  "Microsoft Windows Server 2012 R2, 2016 + 2019",
+  "Red Hat 7 (ppc64le)"
+]
+[
+  "4.4.0",
+  "Debian 9, 10 / Ubuntu 16.04 + 18.04",
+  "Red Hat + CentOS 6, 7, 8 / SUSE 12 + 15 / Amazon Linux 2",
+  "Microsoft Windows Server 2012 R2, 2016 + 2019",
+  "Red Hat 7 (ppc64le)"
+]
 ```
 
