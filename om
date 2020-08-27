@@ -286,6 +286,12 @@ else
                 "--version")
                 version="$value"
                 ;;
+                "--requirements")
+                requirements="true"
+                ;;
+                "--platform")
+                platform="$value"
+                ;;
                 esac
             done
         if [[ $showversions == "true" ]] 
@@ -299,7 +305,12 @@ else
                 cat $OMRELEASEDIR/omreleases.json | jq '.oldReleases[] | select(.version | contains("4.0.","4.4.","4.2.","4.3.")) | [.version, .platform[].os] | select(.[] | contains("'$version'"))' 
                 cat $OMRELEASEDIR/omreleases.json | jq '.oldReleases[] | select(.version | contains("4.0.","4.4.","4.2.","4.3.")) | [.version, .platform[].os] | select(.[] | contains("'$version'"))' 
             fi
+            
         fi
-        
+        if [[ $requirements == "true" ]] 
+        then
+            echo "Requirements for OM:"
+            cat requirements.txt | grep -i "$platform"
+        fi       
     fi    
 fi
