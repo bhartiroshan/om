@@ -121,7 +121,57 @@ cat om-template-config.json | jq '.mongodProcesses[].servers[0,1,2].hostname = $
 
 ```
 sudo ./om install --config=om-config.json 
+
+############################################
+Starting Automation Agent in Headless Mode:
+############################################
+Waiting for mongod processes to be in healthy state.                         Currently 0 processes up.                         Sleeping for 05 Seconds: Sorry!
+Waiting for mongod processes to be in healthy state.                         Currently 0 processes up.                         Sleeping for 05 Seconds: Sorry!
+Waiting for mongod processes to be in healthy state.                         Currently 0 processes up.                         Sleeping for 05 Seconds: Sorry!
+Waiting for mongod processes to be in healthy state.                         Currently 0 processes up.                         Sleeping for 05 Seconds: Sorry!
+
+MongoDB Processes are in healthy State, preparing to download Ops Manager:
+
+################################################
+Download URL for Ops Manager from: https://downloads.mongodb.com/on-prem-mms/tar/mongodb-mms-4.2.14.56911.20200603T2241Z-1.x86_64.tar.gz
+################################################
+The require version /opt/mongodb/mongodb-mms4.2.14 already exists, skipping downloading it.
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    50  100    50    0     0  50000      0 --:--:-- --:--:-- --:--:-- 50000
+###################################################################################
+Starting Ops Manager 4.2.14 from bin location /opt/mongodb/mongodb-mms4.2.14/bin/mongodb-mms
+###################################################################################
+Starting pre-flight checks
+Successfully finished pre-flight checks
+
+Migrate Ops Manager data
+   Running migrations...                                   [  OK  ]
+Starting Ops Manager server
+   Instance 0 starting.................                    [  OK  ]
+Starting pre-flight checks
+Successfully finished pre-flight checks
+
+Start Backup Daemon...                                     [  OK  ]
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   859  100   698  100   161    973    224 --:--:-- --:--:-- --:--:--  1196
 ```
+- After successful installation you will see metadata and URL to access your Ops Manager.
+
+```
+User created successfully.
+Url to Access and Setup your Ops Manager: http://example.com:8080
+A .info file has been placed in /opt/mongodb/OM4214.info, it has path to binaries to start Application Database or Ops Manager.
+{
+  "installName": "OM4214",
+  "version": "4.2.14",
+  "mmsbin": "/opt/mongodb/mongodb-mms4.2.14/bin/mongodb-mms",
+  "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.2.14.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
+}
+
+```
+
 ## To list available platforms
 ```
 sudo ./om list --available-platforms # would show for all versions
