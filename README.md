@@ -23,7 +23,7 @@
 
 ```
 sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debian/SUSE]
-                  [--config= CONFIG_FILE_NAME]
+                  [--config=CONFIG_FILE_NAME]
             list  [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debian/SUSE]
                   [--available-platforms] [--version=4.x]
                   [--available-versions]
