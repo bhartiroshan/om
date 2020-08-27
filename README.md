@@ -23,7 +23,7 @@
 
 ```
 sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debian/SUSE]
-                  [--config=om-config.json]
+                  [--config= CONFIG_FILE_NAME]
             list  [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debian/SUSE]
                   [--available-platforms] [--version=4.x]
                   [--available-versions]
@@ -35,7 +35,7 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
 ```
 git clone https://github.com/bhartiroshan/om.git
 
-sudo ./om install --requirements -platform=amazon ## or [redhat/suse/ubuntu/debian]
+sudo ./om install --requirements --platform=amazon ## or [redhat/suse/ubuntu/debian]
 ```
 
 ## Create a config file from the template provided
