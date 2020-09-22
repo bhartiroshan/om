@@ -45,6 +45,8 @@ cd om
 ```
 sudo ./om install --requirements --platform=amazon ## or [redhat/suse/ubuntu/debian]
 ```
+- See the [requirements here](https://github.com/bhartiroshan/om/blob/master/requirements.txt). 
+- In some cases where your repos are not updated these packages installation may fail. 
 
 ### Generate a config file from the template provided
 
