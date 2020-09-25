@@ -1,4 +1,4 @@
-# OM Installation(Automation) Bash Script - Quickly setup your lab Ops Manager environment 
+# OM Installation(Automation) Bash Script - Quickly setup your Ops Manager environment 
 
 # Features
 
