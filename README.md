@@ -206,5 +206,5 @@ sudo ./om list --available-platforms --version=4.4 #would only show for 4.4 vers
 ]
 ```
 
-## Please refer to [MongoDB Licensing](https://www.mongodb.com/community/licensing) for MongoDB enterprsie before using this script. 
+## Please refer to [MongoDB Licensing](https://www.mongodb.com/community/licensing) for MongoDB Enterprsie usage before using this script. 
 
