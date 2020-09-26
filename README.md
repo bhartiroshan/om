@@ -21,6 +21,14 @@
 - git :) 
 - Make sure your repos are updated(to install other requirements)
 
+## Installation
+
+```
+git clone https://github.com/bhartiroshan/om.git
+
+cd om
+```
+
 ## Usage
 
 ```
@@ -30,15 +38,6 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
                   [--available-platforms] [--version=4.x]
                   [--available-versions]
  ``` 
-  
-
-## Installation
-
-```
-git clone https://github.com/bhartiroshan/om.git
-
-cd om
-```
 
 ### Install requirements
 
