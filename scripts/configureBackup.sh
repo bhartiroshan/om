@@ -10,10 +10,7 @@ configure_backup(){
     local OMHOST=$6
 
     mkdir -p $HEADDB
-    chown -R 'mongodb-mms':'mongodb-mms' $HEADDB
-
     mkdir -p $FSSTORE
-    chown -R 'mongodb-mms':'mongodb-mms' $FSSTORE
 
     HOSTNAME=`hostname -f`
 
@@ -45,6 +42,7 @@ configure_backup(){
     "assignmentEnabled" : true,
     "mmapv1CompressionSetting" : "NONE",
     "storePath" : "'$FSSTORE'",
+    "id" : "FSSTORE",
     "wtCompressionSetting" : "NONE"
     }'
 
@@ -59,7 +57,8 @@ configure_backup(){
     "labels" : [ "l1", "l2" ],
     "maxCapacityGB" : 8,
     "uri" : "'$BLOCKSTORE'",
-    "ssl" : true,
+    "id" : "OPLOG",
+    "ssl" : false,
     "writeConcern" : "W2"
     }'
 
@@ -74,7 +73,8 @@ configure_backup(){
     "loadFactor" : 2,
     "maxCapacityGB" : 8,
     "uri" : "'$BLOCKSTORE'",
-    "ssl" : true,
+    "ssl" : false,
+    "id" : "BLOCKSTORE",
     "writeConcern" : "W2"
     }'
 
