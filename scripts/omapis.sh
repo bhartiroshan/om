@@ -11,7 +11,7 @@ create_user(){
   curl --digest \
      --header "Accept: application/json" \
      --header "Content-Type: application/json" \
-     --request POST "http://$omhost:8080/api/public/v1.0/unauth/users?pretty=true&whitelist=0.0.0.0" \
+     --request POST "http://$omhost:8080/api/public/v1.0/unauth/users?pretty=true&whitelist=127.0.0.1" \
      --data '
        {
          "username": "'$username'",
