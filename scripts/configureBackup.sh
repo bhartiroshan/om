@@ -17,6 +17,7 @@ configure_backup(){
 
     HOSTNAME=`hostname -f`
 
+    # Enable Backup Daemon
     curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
      --header 'Accept: application/json' \
      --header 'Content-Type: application/json' \
@@ -34,5 +35,47 @@ configure_backup(){
        "resourceUsageEnabled" : true,
        "restoreQueryableJobsEnabled" : true
      }'
+
+     # Create Filesystem Store
+    curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
+    --header 'Accept: application/json' \
+    --header 'Content-Type: application/json' \
+    --request POST "http://$OMHOST:8080/api/public/v1.0/admin/backup/snapshot/fileSystemConfigs?pretty=true" \
+    --data '{
+    "assignmentEnabled" : true,
+    "mmapv1CompressionSetting" : "NONE",
+    "storePath" : "'$FSSTORE'",
+    "wtCompressionSetting" : "NONE"
+    }'
+
+    #Create Oplog Store
+    curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
+    --header 'Accept: application/json' \
+    --header 'Content-Type: application/json' \
+    --request POST "http://$OMHOST:8080/api/public/v1.0/admin/backup/oplog/mongoConfigs?pretty=true" \
+    --data '{
+    "assignmentEnabled" : true,
+    "encryptedCredentials" : false,
+    "labels" : [ "l1", "l2" ],
+    "maxCapacityGB" : 8,
+    "uri" : "'$BLOCKSTORE'",
+    "ssl" : true,
+    "writeConcern" : "W2"
+    }'
+
+    #Create Blockstore
+    curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
+    --header 'Accept: application/json' \
+    --header 'Content-Type: application/json' \
+    --request POST "http://$OMHOST:8080/api/public/v1.0/admin/backup/snapshot/mongoConfigs?pretty=true" \
+    --data '{
+    "assignmentEnabled" : true,
+    "encryptedCredentials" : false,
+    "loadFactor" : 2,
+    "maxCapacityGB" : 8,
+    "uri" : "'$BLOCKSTORE'",
+    "ssl" : true,
+    "writeConcern" : "W2"
+    }'
 
 }
