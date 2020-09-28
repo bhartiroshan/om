@@ -232,12 +232,20 @@ then
                 then
                     echo "User created successfully."
                     cat $MMSFOLDER/userapiresp.log | jq '.'
-                    PRIVATEKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.programmaticApiKey.privatekKey'`
-                    PUBLICKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.programmaticApiKey.publickKey'`
+
+                    PRIVATEKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.programmaticApiKey.privateKey'`
+                    
+                    if [[ $PRIVATEKEY == "" ]]
+                    then
+                        PRIVATEKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.apiKey'`
+                        PUBLICKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.user.emailAddress'`
+                    else
+                        PUBLICKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.programmaticApiKey.publicKey'`
+                    fi    
                     HEADDB=`cat $configpath | jq -r '.opsManager[].backupdaemon[].headdb'`
                     BLOCKSTORE=$host01:$dbport01,$host02:$dbport02,$host03:$dbport03
                     FSSTORE=`cat $configpath | jq -r '.opsManager[].backupdaemon[].fsstore'`
-                    configureBackup $PRIVATEKEY $PUBLICKEY $HEADDB $BLOCKSTORE $FSSTORE $EC2HOSTNAME >>>$MMSFOLDER/backupconfig.log
+                    configure_backup $PRIVATEKEY $PUBLICKEY $HEADDB $BLOCKSTORE $FSSTORE $EC2HOSTNAME >>$MMSFOLDER/backupconfig.log
 
                 else
                     echo "Some error occured when creating user, please check $MMSFOLDER/userapiresp.log"
