@@ -7,13 +7,14 @@ configure_backup(){
     local HEADDB=$3
     local BLOCKSTORE=$4
     local FSSTORE=$5
-    local OMHOST=$6
+    local OMHOST="localhost"
 
     mkdir -p $HEADDB
     mkdir -p $FSSTORE
 
     HOSTNAME=`hostname -f`
-
+    sleep 10
+    echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
     # Enable Backup Daemon
     curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
      --header 'Accept: application/json' \
@@ -56,7 +57,7 @@ configure_backup(){
     "encryptedCredentials" : false,
     "labels" : [ "l1", "l2" ],
     "maxCapacityGB" : 8,
-    "uri" : "'$BLOCKSTORE'",
+    "uri" : "'mongodb://$BLOCKSTORE'",
     "id" : "OPLOG",
     "ssl" : false,
     "writeConcern" : "W2"
@@ -72,7 +73,7 @@ configure_backup(){
     "encryptedCredentials" : false,
     "loadFactor" : 2,
     "maxCapacityGB" : 8,
-    "uri" : "'$BLOCKSTORE'",
+    "uri" : "'mongodb://$BLOCKSTORE'",
     "ssl" : false,
     "id" : "BLOCKSTORE",
     "writeConcern" : "W2"
