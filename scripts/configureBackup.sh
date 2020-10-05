@@ -15,6 +15,25 @@ configure_backup(){
     HOSTNAME=`hostname -f`
     sleep 10
     echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
+
+    echo -e "  curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
+     --header 'Accept: application/json' \
+     --header 'Content-Type: application/json' \
+     --request PUT "http://$OMHOST:8080/api/public/v1.0/admin/backup/daemon/configs/$HOSTNAME?pretty=true" \
+     --data '{
+       "assignmentEnabled" : true,
+       "backupJobsEnabled" : true,
+       "configured" : true,
+       "garbageCollectionEnabled" : true,
+       "machine" : {
+         "headRootDirectory" : "$HEADDB",
+         "machine" : "$HOSTNAME"
+       },
+       "numWorkers" : 4,
+       "resourceUsageEnabled" : true,
+       "restoreQueryableJobsEnabled" : true
+     }'"
+     
     # Enable Backup Daemon
     curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
      --header 'Accept: application/json' \
