@@ -235,7 +235,7 @@ then
 
                     PRIVATEKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.programmaticApiKey.privateKey'`
                     
-                    if [[ $PRIVATEKEY == "" ]]
+                    if [[ $PRIVATEKEY == "null" ]]
                     then
                         PRIVATEKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.apiKey'`
                         PUBLICKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.user.emailAddress'`
