@@ -245,6 +245,7 @@ then
                     HEADDB=`cat $configpath | jq -r '.opsManager[].backupdaemon[].headdb'`
                     BLOCKSTORE=$host01:$dbport01,$host02:$dbport02,$host03:$dbport03
                     FSSTORE=`cat $configpath | jq -r '.opsManager[].backupdaemon[].fsstore'`
+                    echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
                     configure_backup $PRIVATEKEY $PUBLICKEY $HEADDB $BLOCKSTORE $FSSTORE $EC2HOSTNAME >>$MMSFOLDER/backupconfig.log
 
                 else
