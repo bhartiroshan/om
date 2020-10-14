@@ -2,6 +2,7 @@
 source ./scripts/omapis.sh
 source ./scripts/downloads.sh
 source ./scripts/configureBackup.sh
+source ./scripts/init.sh
 
 #Pre-requisite create /data folder
 
@@ -282,6 +283,12 @@ else
     else  
         mkdir -p $OMRELEASEDIR  
         sudo curl --output $OMRELEASEDIR/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
+    fi
+
+    if [["$command" == "init"]]
+    then
+        platform=`$2 cut -d '=' -f2`
+        init platform
     fi
 
     if [[ "$command" == "list" ]] 
