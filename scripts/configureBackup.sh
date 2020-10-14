@@ -98,6 +98,14 @@ configure_backup(){
     "writeConcern" : "W2"
     }'
 
+    #Create Organization
+    curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
+      --header 'Accept: application/json' \
+      --header 'Content-Type: application/json' \
+      --request POST "http://$OMHOST:8080/api/public/v1.0/orgs" \
+      --data
+    '{ "name" : "OM Automation" }'
+
     #create Project
     curl --user "$PUBLICKEY:$PRIVATEKEY"  --digest \
     --header "Accept: application/json" \
