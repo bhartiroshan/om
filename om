@@ -251,9 +251,6 @@ then
                 else
                     echo "Some error occured when creating user, please check $MMSFOLDER/userapiresp.log"
                     cat $MMSFOLDER/userapiresp.log | jq '.'
-                    echo "If running OM 4.2.x version then enable Backup Daemon at $HEADDB, the Oplog/Blockstore/Filesystem store should be already configured."
-                    echo "No action needed for OM 4.4.x deployments."
-
                 fi
 
             #     echo -e "****MetaData of your Install**** \n Start Service: $MMS_BIN start \n Stop Service: $MMS_BIN stop \n AppDB Connection: $CONNSTRING \n Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080 \n Start your AppDB:             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
@@ -272,6 +269,8 @@ then
                 echo $JSON_STRING >$OMRELEASEDIR/$INSTALLNAME.info
                 echo "A .info file has been placed in $OMRELEASEDIR/$INSTALLNAME.info, it has path to binaries to start Application Database or Ops Manager."
                 cat $OMRELEASEDIR/$INSTALLNAME.info | jq '.'
+                echo "If running OM 4.2.x version then enable Backup Daemon at $HEADDB, the Oplog/Blockstore/Filesystem store should be already configured."
+                echo "No action needed for OM 4.4.x deployments."
             fi
         fi
     fi
