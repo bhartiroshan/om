@@ -247,6 +247,8 @@ then
                     FSSTORE=`cat $configpath | jq -r '.opsManager[].backupdaemon[].fsstore'`
                     echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
                     configure_backup $PRIVATEKEY $PUBLICKEY $HEADDB $BLOCKSTORE $FSSTORE $EC2HOSTNAME >>$MMSFOLDER/backupconfig.log
+                    echo "If running OM 4.2.x version then enable Backup Daemon at $HEADDB, the Oplog/Blockstore/Filesystem store should be already configured."
+                    echo "No action needed for OM 4.4.x deployments."
 
                 else
                     echo "Some error occured when creating user, please check $MMSFOLDER/userapiresp.log"
