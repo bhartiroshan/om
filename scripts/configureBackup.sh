@@ -98,4 +98,14 @@ configure_backup(){
     "writeConcern" : "W2"
     }'
 
+    #create Project
+    curl --user "$PUBLICKEY:$PRIVATEKEY"  --digest \
+    --header "Accept: application/json" \
+    --header "Content-Type: application/json" \
+    --request POST "http://$OMHOST:8080/api/public/v1.0/groups?pretty=true" \
+    --data '
+      {
+        "name": "MongoDB Project"
+      }'
+
 }
