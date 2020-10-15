@@ -1,6 +1,8 @@
 #!/bin/bash
 source ./scripts/omapis.sh
 source ./scripts/downloads.sh
+source ./scripts/configureBackup.sh
+source ./scripts/init.sh
 
 #Pre-requisite create /data folder
 
@@ -231,10 +233,24 @@ then
                 then
                     echo "User created successfully."
                     cat $MMSFOLDER/userapiresp.log | jq '.'
+
+                    PRIVATEKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.programmaticApiKey.privateKey'`
+                    
+                    if [[ $PRIVATEKEY == "null" ]]
+                    then
+                        PRIVATEKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.apiKey'`
+                        PUBLICKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.user.emailAddress'`
+                    else
+                        PUBLICKEY=`cat $MMSFOLDER/userapiresp.log | jq -r '.programmaticApiKey.publicKey'`
+                    fi    
+                    HEADDB=`cat $configpath | jq -r '.opsManager[].backupdaemon[].headdb'`
+                    BLOCKSTORE=$host01:$dbport01,$host02:$dbport02,$host03:$dbport03
+                    FSSTORE=`cat $configpath | jq -r '.opsManager[].backupdaemon[].fsstore'`
+                    echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
+                    configure_backup $PRIVATEKEY $PUBLICKEY $HEADDB $BLOCKSTORE $FSSTORE $EC2HOSTNAME >>$MMSFOLDER/backupconfig.log
                 else
                     echo "Some error occured when creating user, please check $MMSFOLDER/userapiresp.log"
                     cat $MMSFOLDER/userapiresp.log | jq '.'
-
                 fi
 
             #     echo -e "****MetaData of your Install**** \n Start Service: $MMS_BIN start \n Stop Service: $MMS_BIN stop \n AppDB Connection: $CONNSTRING \n Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080 \n Start your AppDB:             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
@@ -253,6 +269,8 @@ then
                 echo $JSON_STRING >$OMRELEASEDIR/$INSTALLNAME.info
                 echo "A .info file has been placed in $OMRELEASEDIR/$INSTALLNAME.info, it has path to binaries to start Application Database or Ops Manager."
                 cat $OMRELEASEDIR/$INSTALLNAME.info | jq '.'
+                echo "If running OM 4.2.x version then enable Backup Daemon at $HEADDB, the Oplog/Blockstore/Filesystem store should be already configured."
+                echo "No action needed for OM 4.4.x deployments."
             fi
         fi
     fi
@@ -263,6 +281,12 @@ else
     else  
         mkdir -p $OMRELEASEDIR  
         sudo curl --output $OMRELEASEDIR/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
+    fi
+
+    if [["$command" == "init"]]
+    then
+        platform=`$2 cut -d '=' -f2`
+        init platform
     fi
 
     if [[ "$command" == "list" ]] 
