@@ -8,7 +8,7 @@
 - Creates a 3 nodes Application Database
 - No dependencies other than MongoDB entrprise packages listed in requirements.txt
 
-## Supported Platforms
+## Supported Platforms (Tested on Amazon/Centos machines)
 
 - Redhat/Centos
 - Amazon
