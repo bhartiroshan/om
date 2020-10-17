@@ -49,6 +49,9 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
  ``` 
 
 ### Installing Ops Manager
+ - Fresh Install(See this section)
+ - [Upgrade Ops Manager]()
+ - [Install multiple versions(co-exist multiple versions)]()
 
 - The `init` command installs requirements and generates `om-config.json`, this json you can use for installation purpose.
 
@@ -180,6 +183,56 @@ No action needed for OM 4.4.x deployments.
 ```
 - Please note the user credentials provided in om-config.json for signing in. 
 - The backups should be pre-configured. 
+
+### Upgrade Ops Manager
+
+- Stop existing Ops Manager, see `.info` file for Ops Manager binary.
+```
+{
+  "installName": "OM421",
+  "version": "4.4.2",
+  "mmsbin": "/opt/mongodb/mongodb-mms4.4.2/bin/mongodb-mms",
+  "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.4.2.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
+}
+```
+- `/opt/mongodb/mongodb-mms4.4.2/bin/mongodb-mms stop`
+- Edit `om-config.json` and enter the new(higher) Ops Manager version. 
+- Install the new version `sudo ./om install --config=om-config.json`.
+
+### Install multiple versions(co-exist multiple versions)
+
+- Stop existing Ops Manager, see `.info` file for Ops Manager binary.
+```
+{
+  "installName": "OM421",
+  "version": "4.4.2",
+  "mmsbin": "/opt/mongodb/mongodb-mms4.4.2/bin/mongodb-mms",
+  "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.4.2.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
+}
+```
+- `/opt/mongodb/mongodb-mms4.4.2/bin/mongodb-mms stop`
+- Stop existing AppDB `mongod` process, you may use `pkill mongo`.
+- Edit `om-config.json` and enter a new AppDB Path/logpath, Install Name and desired OM version.
+  - These specs are available under opsManager.installName, opsManager.version, mongodProcesses.servers[0/1/2].dbPath/logPath.
+```
+    "opsManager": [
+        {
+        "installName":"OM421",
+        "version": "4.2.15",
+        .
+        .
+        .
+    "mongodProcesses": [
+        {
+            "servers":[
+                {
+                    "id": "Server01",
+                    "port": 27017,
+                    "replSetName": "ops-manager-db",
+                    "dbPath": "/data/node1"
+```
+
+- Install the new version `sudo ./om install --config=om-config.json`.
 
 ## To list available platforms
 ```
