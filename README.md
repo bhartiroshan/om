@@ -73,7 +73,7 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
         "backupdaemon": [
                 {
                 "headdb": "/opt/head",
-                "user": "mongodb-mms"
+                "fsstore":"/opt/snapshot",
                 }
             ]
         }
