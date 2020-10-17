@@ -29,13 +29,13 @@ git clone https://github.com/bhartiroshan/om.git
 cd om
 ```
 
-### Install requirements
+### Install requirements - (Init only first time)
 
 ```
-sudo ./om install --requirements --platform=amazon ## or [redhat/suse/ubuntu/debian]
+sudo ./om init --platform=amazon ## or [redhat/suse/ubuntu/debian]
 ```
+- In some cases where your repos are not updated the packages installation may fail. 
 - See the [requirements here](https://github.com/bhartiroshan/om/blob/master/requirements.txt). 
-- In some cases where your repos are not updated these packages installation may fail. 
 
 ## Usage
 
@@ -45,19 +45,14 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
             list  [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debian/SUSE]
                   [--available-platforms] [--version=4.x]
                   [--available-versions]
+            init  [--platform=amazon/redhat/suse/ubuntu/debian]
  ``` 
- 
-### Generate a config file from the template provided
-
-- This creates a om-config.json and updates your hostname in it. 
-
-```
-cat om-template-config.json | jq '.mongodProcesses[].servers[0,1,2].hostname = $host' --arg host "$(hostname -f)" >om-config.json
-```
 
 ### Installing Ops Manager
 
-- Edit om-config.json and change any respective values(e.g. Ops Manager version/AppDB MongoDB version/Platform installing on)
+- The `init` command installs requirements and generates `om-config.json`, this json you can use for installation purpose.
+
+- Edit om-config.json and change any respective values(e.g. Ops Manager version/AppDB MongoDB version/Platform installing on). Please note that only for package only `tar.gz` is supported so do not change it.
 
 ```
 {
@@ -169,18 +164,22 @@ Start Backup Daemon...                                     [  OK  ]
 - After successful installation you will see metadata and URL to access your Ops Manager.
 
 ```
-User created successfully.
-Url to Access your Ops Manager: http://example.com:8080
-A .info file has been placed in /opt/mongodb/OM4214.info, it has path to binaries to start Application Database or Ops Manager.
+=====================================================================================================================================
+Url to Access and Setup your Ops Manager: http://ec2-13-232-83-182.ap-south-1.compute.amazonaws.com:8080
+=====================================================================================================================================
+A .info file has been placed in /opt/mongodb/OM421.info, it has path to binaries to start Application Database or Ops Manager.
 {
-  "installName": "OM4214",
-  "version": "4.2.14",
-  "mmsbin": "/opt/mongodb/mongodb-mms4.2.14/bin/mongodb-mms",
-  "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.2.14.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
+  "installName": "OM421",
+  "version": "4.4.2",
+  "mmsbin": "/opt/mongodb/mongodb-mms4.4.2/bin/mongodb-mms",
+  "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.4.2.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
 }
+=====================================================================================================================================
+If running OM 4.2.x version then enable Backup Daemon at /opt/head, the Oplog/Blockstore/Filesystem store should be already configured.
+No action needed for OM 4.4.x deployments.
 ```
-- Please note the user creadentisl provided in om-config.json for signing in. 
-- After successful login create Organization. 
+- Please note the user credentials provided in om-config.json for signing in. 
+- The backups should be pre-configured. 
 
 ## To list available platforms
 ```
