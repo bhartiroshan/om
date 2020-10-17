@@ -51,7 +51,7 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
 ### Installing Ops Manager
  1. Fresh Install(See this section)
  2. [Upgrade Ops Manager](#upgrade-ops-manager)
- 3. [Install multiple versions(co-exist multiple versions)]()
+ 3. [Install multiple versions(co-exist multiple versions)](#install-multiple-versionsco-exist-multiple-versions)
 
 - The `init` command installs requirements and generates `om-config.json`, this json you can use for installation purpose.
 
