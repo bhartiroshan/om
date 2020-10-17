@@ -286,10 +286,10 @@ else
         sudo curl --output $OMRELEASEDIR/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
     fi
 
-    if [["$command" == "init"]]
+    if [[ "$command" == "init" ]]
     then
-        platform=`$2 cut -d '=' -f2`
-        init platform
+        platform=`echo $2 | cut -d '=' -f2`
+        init $platform
     fi
 
     if [[ "$command" == "list" ]] 
