@@ -213,7 +213,7 @@ No action needed for OM 4.4.x deployments.
 - `/opt/mongodb/mongodb-mms4.4.2/bin/mongodb-mms stop`
 - Stop existing AppDB `mongod` process, you may use `pkill mongo`.
 - Edit `om-config.json` and enter a new AppDB Path/logpath, Install Name and desired OM version.
-  - These specs are available under opsManager.installName, opsManager.version, mongodProcesses.servers[0/1/2].dbPath/logPath.
+  - These specs are available under `opsManager.installName`, `opsManager.version`, `mongodProcesses`.`servers[0/1/2].dbPath/logPath`.
 ```
     "opsManager": [
         {
