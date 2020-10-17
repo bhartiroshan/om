@@ -14,26 +14,8 @@ configure_backup(){
 
     HOSTNAME=`hostname -f`
     sleep 10
-    echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
+    #echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
 
-    echo -e "  curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
-     --header 'Accept: application/json' \
-     --header 'Content-Type: application/json' \
-     --request PUT "http://$OMHOST:8080/api/public/v1.0/admin/backup/daemon/configs/$HOSTNAME?pretty=true" \
-     --data '{
-       "assignmentEnabled" : true,
-       "backupJobsEnabled" : true,
-       "configured" : true,
-       "garbageCollectionEnabled" : true,
-       "machine" : {
-         "headRootDirectory" : "$HEADDB",
-         "machine" : "$HOSTNAME"
-       },
-       "numWorkers" : 4,
-       "resourceUsageEnabled" : true,
-       "restoreQueryableJobsEnabled" : true
-     }'"
-     
     # Enable Backup Daemon
     curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
      --header 'Accept: application/json' \
@@ -99,12 +81,12 @@ configure_backup(){
     }'
 
     #Create Organization
-    curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
+    orgId=`curl --user "$PUBLICKEY:$PRIVATEKEY" --digest \
       --header 'Accept: application/json' \
       --header 'Content-Type: application/json' \
       --request POST "http://$OMHOST:8080/api/public/v1.0/orgs" \
-      --data
-    '{ "name" : "OM Automation" }'
+      --data \
+    '{ "name" : "OM Automation" }' | jq -r '.id'`
 
     #create Project
     curl --user "$PUBLICKEY:$PRIVATEKEY"  --digest \
@@ -113,7 +95,8 @@ configure_backup(){
     --request POST "http://$OMHOST:8080/api/public/v1.0/groups?pretty=true" \
     --data '
       {
-        "name": "MongoDB Project"
+        "name": "MongoDB Project",
+        "orgId": "'$orgId'"
       }'
 
 }

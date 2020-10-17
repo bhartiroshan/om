@@ -256,6 +256,7 @@ then
             #     echo -e "****MetaData of your Install**** \n Start Service: $MMS_BIN start \n Stop Service: $MMS_BIN stop \n AppDB Connection: $CONNSTRING \n Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080 \n Start your AppDB:             $mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
             # -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
             # -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &" >$MMSFOLDER/$FILE_NAME.info
+                echo "====================================================================================================================================="
                 echo "Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080" 
  
                 INSTALLNAME=`cat $configpath | jq -r '.opsManager[].installName'`
@@ -267,10 +268,13 @@ then
                                 --arg mmsautomation "$MMSAUTOMATION"\
                                 '{installName: $installname, version: $version, mmsbin: $mmsbin, appdb_bin: $mmsautomation}' )
                 echo $JSON_STRING >$OMRELEASEDIR/$INSTALLNAME.info
+                echo "====================================================================================================================================="
                 echo "A .info file has been placed in $OMRELEASEDIR/$INSTALLNAME.info, it has path to binaries to start Application Database or Ops Manager."
                 cat $OMRELEASEDIR/$INSTALLNAME.info | jq '.'
+                echo "====================================================================================================================================="
                 echo "If running OM 4.2.x version then enable Backup Daemon at $HEADDB, the Oplog/Blockstore/Filesystem store should be already configured."
                 echo "No action needed for OM 4.4.x deployments."
+                echo "====================================================================================================================================="
             fi
         fi
     fi
@@ -283,10 +287,10 @@ else
         sudo curl --output $OMRELEASEDIR/omreleases.json https://info-mongodb-com.s3.amazonaws.com/com-download-center/ops_manager_release_archive.json
     fi
 
-    if [["$command" == "init"]]
+    if [[ "$command" == "init" ]]
     then
-        platform=`$2 cut -d '=' -f2`
-        init platform
+        platform=`echo $2 | cut -d '=' -f2`
+        init $platform
     fi
 
     if [[ "$command" == "list" ]] 

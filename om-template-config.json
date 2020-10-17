@@ -16,8 +16,7 @@
         "backupdaemon": [
                 {
                 "headdb": "/opt/head",
-                "fsstore":"/opt/snapshot",
-                "user": "mongodb-mms"
+                "fsstore":"/opt/snapshot"
                 }
             ]
         }
