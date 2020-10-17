@@ -95,7 +95,7 @@ configure_backup(){
     --request POST "http://$OMHOST:8080/api/public/v1.0/groups?pretty=true" \
     --data '
       {
-        "name": "MongoDB Project"
+        "name": "MongoDB Project",
         "orgId": "'$orgId'"
       }'
 
