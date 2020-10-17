@@ -16,7 +16,7 @@
         "backupdaemon": [
                 {
                 "headdb": "/opt/head",
-                "fsstore":"/opt/snapshot",
+                "fsstore":"/opt/snapshot"
                 }
             ]
         }
