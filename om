@@ -44,6 +44,12 @@ then
             "--version")
             version_arg="$value"
             ;;
+            "--username")
+            username="$value"
+            ;;
+            "--password")
+            password="$value"
+            ;;
             esac
             
         done
@@ -223,6 +229,21 @@ then
                 echo "Starting Ops Manager $version from bin location $MMS_BIN start"
                 echo "###################################################################################"
                 $MMS_BIN start
+
+                if [ -z "$username" ]
+                then
+                    echo "No username argument supplied via CLI, use the one in $configpath"
+                else
+                    cat $configpath | jq '.opsManager[].userconfig[].login = $username' --arg username "$username"  >om-temp.json
+                    mv om-temp.json $configpath
+                fi
+                if [ -z "$password" ]
+                then
+                    echo "No password argument supplied via CLI, use the one in $configpath"
+                else
+                    cat $configpath | jq '.opsManager[].userconfig[].password = $password' --arg password "$password"  >om-temp.json
+                    mv om-temp.json $configpath
+                fi
 
                 #Creating First User:
                 login=`cat $configpath | jq -r '.opsManager[].userconfig[].login'`
