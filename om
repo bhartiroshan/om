@@ -41,6 +41,9 @@ then
             "--platform")
             platform="$value"
             ;;
+            "--version")
+            version_arg="$value"
+            ;;
             esac
             
         done
@@ -55,6 +58,13 @@ then
         echo "Reading config from $configpath"
 
         prechecks $AUTOMATIONDIR $OMRELEASEDIR $CONFDIR $MONGODRELEASES
+        if [ -z "$version_arg" ]
+        then
+            echo "No version argument supplied via CLI, use the one in $configpath"
+        else
+            cat $configpath | jq '.opsManager[].version = $version_arg' --argjson version_arg "$version_arg"  >om-temp.json
+            mv om-temp.json $configpath
+        fi
 
         version=$(cat $configpath | jq  .opsManager[].version)
         version01=$(cat $configpath | jq -r .opsManager[].version)
