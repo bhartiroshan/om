@@ -13,7 +13,7 @@ configure_backup(){
     mkdir -p $FSSTORE
 
     HOSTNAME=`hostname -f`
-    sleep 10
+    sleep 5
     #echo "PUBLICKEY -> $PUBLICKEY PRIVATEKEY -> $PRIVATEKEY"
 
     # Enable Backup Daemon

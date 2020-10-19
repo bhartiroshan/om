@@ -37870,7 +37870,14 @@
           "replSetName": "ops-manager-db"
         },
         "storage": {
-          "dbPath": "/data/node1"
+          "dbPath": "/data/node1",
+          "wiredTiger": {
+            "collectionConfig": {},
+            "engineConfig": {
+                "cacheSizeGB": 0.5
+            },
+            "indexConfig": {}
+        }
         },
         "systemLog": {
           "destination": "file",
@@ -37893,7 +37900,14 @@
           "replSetName": "ops-manager-db"
         },
         "storage": {
-          "dbPath": "/data/node2"
+          "dbPath": "/data/node2",
+          "wiredTiger": {
+            "collectionConfig": {},
+            "engineConfig": {
+                "cacheSizeGB": 0.5
+            },
+            "indexConfig": {}
+        }
         },
         "systemLog": {
           "destination": "file",
@@ -37916,7 +37930,14 @@
           "replSetName": "ops-manager-db"
         },
         "storage": {
-          "dbPath": "/data/node3"
+          "dbPath": "/data/node3",
+          "wiredTiger": {
+            "collectionConfig": {},
+            "engineConfig": {
+                "cacheSizeGB": 0.5
+            },
+            "indexConfig": {}
+        }
         },
         "systemLog": {
           "destination": "file",

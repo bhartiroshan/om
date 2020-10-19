@@ -50,8 +50,9 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
 
 ### Installing Ops Manager
  1. Fresh Install(See this section)
- 2. [Upgrade Ops Manager](#upgrade-ops-manager)
- 3. [Install multiple versions(co-exist multiple versions)](#install-multiple-versionsco-exist-multiple-versions)
+ 2. [Install by supplying as EC2 startup script](#install-by-supplying-as-ec2-startup-script)
+ 3. [Upgrade Ops Manager](#upgrade-ops-manager)
+ 4. [Install multiple versions(co-exist multiple versions](#install-multiple-versionsco-exist-multiple-versions)
 
 - The `init` command installs requirements and generates `om-config.json`, this json you can use for installation purpose.
 
@@ -168,21 +169,40 @@ Start Backup Daemon...                                     [  OK  ]
 
 ```
 =====================================================================================================================================
-Url to Access and Setup your Ops Manager: http://ec2-13-232-83-182.ap-south-1.compute.amazonaws.com:8080
+Url to Access and Setup your Ops Manager: http://ec2-13-233-103-91.ap-south-1.compute.amazonaws.com:8080
+Username: {username}
+Password: {password}
 =====================================================================================================================================
-A .info file has been placed in /opt/mongodb/OM421.info, it has path to binaries to start Application Database or Ops Manager.
+A .info file has been placed in /opt/mongodb/OM_Cluster01.info, it has path to binaries to start Application Database or Ops Manager.
 {
-  "installName": "OM421",
-  "version": "4.4.2",
-  "mmsbin": "/opt/mongodb/mongodb-mms4.4.2/bin/mongodb-mms",
-  "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.4.2.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
+  "installName": "OM_Cluster01",
+  "version": "4.2.15",
+  "mmsbin": "/opt/mongodb/mongodb-mms4.2.15/bin/mongodb-mms [start|stop]",
+  "appdb_bin": "/opt/mongodb/mongodb-mms-automation/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster /opt/mongodb/conf/cluster-config4.2.15.json 2>&1 > /opt/mongodb/mongodb-mms-automation/headless_agent.log &"
 }
 =====================================================================================================================================
 If running OM 4.2.x version then enable Backup Daemon at /opt/head, the Oplog/Blockstore/Filesystem store should be already configured.
 No action needed for OM 4.4.x deployments.
+=====================================================================================================================================
 ```
 - Please note the user credentials provided in om-config.json for signing in. 
 - The backups should be pre-configured. 
+
+### Install by supplying as EC2 startup script
+- Use below user data while launching EC2.
+- This is tested with t2.large instance type.
+```
+#!/bin/bash
+yum install -y git
+git clone https://github.com/bhartiroshan/om.git ~/om
+cd ~/om
+./om init --platform=amazon
+./om install --config=om-config.json --version=4.4.4 --username={username} --password={password}
+```
+- The version/username/password options are optional, if not supplied the default values from `om-config.json` will be used. 
+- Please note that when supplying `version` make sure it's a valid OM Version else script may fail. 
+- SSH to the instance and view the progress by tailing below file.
+- `tail -f /var/log/cloud-init-output.log`. 
 
 ### Upgrade Ops Manager
 

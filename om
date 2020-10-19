@@ -41,6 +41,15 @@ then
             "--platform")
             platform="$value"
             ;;
+            "--version")
+            version_arg="$value"
+            ;;
+            "--username")
+            username="$value"
+            ;;
+            "--password")
+            password="$value"
+            ;;
             esac
             
         done
@@ -55,6 +64,13 @@ then
         echo "Reading config from $configpath"
 
         prechecks $AUTOMATIONDIR $OMRELEASEDIR $CONFDIR $MONGODRELEASES
+        if [ -z "$version_arg" ]
+        then
+            echo "No version argument supplied via CLI, use the one in $configpath"
+        else
+            cat $configpath | jq '.opsManager[].version = $version_arg' --arg version_arg "$version_arg"  >om-temp.json
+            mv om-temp.json $configpath
+        fi
 
         version=$(cat $configpath | jq  .opsManager[].version)
         version01=$(cat $configpath | jq -r .opsManager[].version)
@@ -129,7 +145,7 @@ then
             mms_automation_bin=$OMRELEASEDIR/mongodb-mms-automation
             #Start Automation Agent in Headless Mode:
             echo "############################################"
-            echo "Starting Automation Agent in Headless Mode:"
+            echo "Starting Automation Agent in Headless Mode to start AppDB nodes:"
             echo "############################################"
             MMSAUTOMATION="$mms_automation_bin/mongodb-mms-automation-agent -pidfilepath /var/log/mongodb-mms-automation-agent.pid \
             -maxLogFileDurationHrs 24 -logLevel INFO -logFile /var/log/mongodb-mms-automation/automation-agent.log \
@@ -146,7 +162,7 @@ then
             mongod_count=`ss -ltnp | grep "$dbport01\|$dbport02\|$dbport03" | wc -l`
             for ((; $mongod_count<3; ));
                 do
-                    echo "Waiting for mongod processes to be in healthy state. \
+                    echo "Waiting for AppDB mongod processes to be in healthy state. \
                         Currently $mongod_count processes up. \
                         Sleeping for 05 Seconds: Sorry!"
                     sleep 5
@@ -158,7 +174,7 @@ then
             if [ $mongod_count -eq 3 ]
             then
                 echo
-                echo "MongoDB Processes are in healthy State, preparing to download Ops Manager:"
+                echo "AppDB MongoDB Processes are in healthy State, preparing to download Ops Manager:"
                 echo    
                 echo "################################################"
                 echo "Download URL for Ops Manager from: $DOWNLOAD_URL"
@@ -210,9 +226,24 @@ then
 
                 cp -f conf-mms.properties.bak "$MMSFOLDER/conf/conf-mms.properties"
                 echo "###################################################################################"
-                echo "Starting Ops Manager $version from bin location $MMS_BIN"
+                echo "Starting Ops Manager $version from bin location $MMS_BIN start"
                 echo "###################################################################################"
                 $MMS_BIN start
+
+                if [ -z "$username" ]
+                then
+                    echo "No username argument supplied via CLI, use the one in $configpath"
+                else
+                    cat $configpath | jq '.opsManager[].userconfig[].login = $username' --arg username "$username"  >om-temp.json
+                    mv om-temp.json $configpath
+                fi
+                if [ -z "$password" ]
+                then
+                    echo "No password argument supplied via CLI, use the one in $configpath"
+                else
+                    cat $configpath | jq '.opsManager[].userconfig[].password = $password' --arg password "$password"  >om-temp.json
+                    mv om-temp.json $configpath
+                fi
 
                 #Creating First User:
                 login=`cat $configpath | jq -r '.opsManager[].userconfig[].login'`
@@ -258,13 +289,15 @@ then
             # -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &" >$MMSFOLDER/$FILE_NAME.info
                 echo "====================================================================================================================================="
                 echo "Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080" 
+                echo "Username: $login"
+                echo "Password: $password"
  
                 INSTALLNAME=`cat $configpath | jq -r '.opsManager[].installName'`
 
                 JSON_STRING=$( jq -n \
                                 --arg installname "$INSTALLNAME" \
                                 --arg version "$version01" \
-                                --arg mmsbin "$MMS_BIN" \
+                                --arg mmsbin "$MMS_BIN [start|stop]" \
                                 --arg mmsautomation "$MMSAUTOMATION"\
                                 '{installName: $installname, version: $version, mmsbin: $mmsbin, appdb_bin: $mmsautomation}' )
                 echo $JSON_STRING >$OMRELEASEDIR/$INSTALLNAME.info
