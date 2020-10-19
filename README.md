@@ -199,6 +199,8 @@ cd ~/om
 ./om init --platform=amazon
 ./om install --config=om-config.json --version=4.4.4 --username={username} --password={password}
 ```
+- The version/username/password options are optional, if not supplied the default values from `om-config.json` will be used. 
+- Please note that when supplying `version` make sure it's a valid OM Version else script may fail. 
 - SSH to the instance and view the progress by tailing below file.
 - `tail -f /var/log/cloud-init-output.log`. 
 
