@@ -289,13 +289,15 @@ then
             # -healthCheckFilePath /var/log/mongodb-mms-automation/agent-health-status.json -cluster $CONFDIR/cluster-config$version01.json 2>&1 >   $mms_automation_bin/headless_agent.log &" >$MMSFOLDER/$FILE_NAME.info
                 echo "====================================================================================================================================="
                 echo "Url to Access and Setup your Ops Manager: http://$EC2HOSTNAME:8080" 
+                echo "Username: $login"
+                echo "Password: $password"
  
                 INSTALLNAME=`cat $configpath | jq -r '.opsManager[].installName'`
 
                 JSON_STRING=$( jq -n \
                                 --arg installname "$INSTALLNAME" \
                                 --arg version "$version01" \
-                                --arg mmsbin "$MMS_BIN" \
+                                --arg mmsbin "$MMS_BIN [start|stop]" \
                                 --arg mmsautomation "$MMSAUTOMATION"\
                                 '{installName: $installname, version: $version, mmsbin: $mmsbin, appdb_bin: $mmsautomation}' )
                 echo $JSON_STRING >$OMRELEASEDIR/$INSTALLNAME.info
