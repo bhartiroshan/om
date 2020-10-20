@@ -129,6 +129,8 @@ sudo ./om install [--requirements] [--platform=Amazon/Redhat/Centos/Ubuntu/Debia
 
 ```
 sudo ./om install --config=om-config.json 
+OR
+./om install --config=om-config.json --version=4.4.4 --username={username} --password={password} # This way you override the one available in om-config.json
 
 ############################################
 Starting Automation Agent in Headless Mode:
