@@ -2,7 +2,7 @@
 
 # Features
 
-- Install any version of Ops Manager 4.2.x -> Latest4.4.x)
+- Install any version of Ops Manager 4.2.x -> Latest(4.4.x)
 - Script takes care of future versions too.
 - Upgrade to any version
 - Install on any supported Linux Platforms
