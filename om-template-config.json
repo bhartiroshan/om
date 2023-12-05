@@ -34,7 +34,7 @@
                     "hostname": "localhost",
                     "name": "ops-manager-db-1",
                     "featureCompatibilityVersion": "4.2",
-                    "version": "4.2.0-ent"
+                    "version": "5.0.5-ent"
                 },
                 {
                     "id": "Server02",
@@ -45,7 +45,7 @@
                     "hostname": "localhost",
                     "name": "ops-manager-db-2",
                     "featureCompatibilityVersion": "4.2",
-                    "version": "4.2.0-ent"
+                    "version": "5.0.5-ent"
                 },
                 {
                     "id": "Server03",
@@ -56,7 +56,7 @@
                     "hostname": "localhost",
                     "name": "ops-manager-db-3",
                     "featureCompatibilityVersion": "4.2",
-                    "version": "4.2.0-ent"
+                    "version": "5.0.5-ent"
                 }
             ]
         }
