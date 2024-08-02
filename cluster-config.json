@@ -37607,6 +37607,234 @@
       ]
     },
     {
+    "builds" : [ {
+      "architecture" : "ppc64le",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "8.0",
+      "minOsVersion" : "7.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-ppc64le-enterprise-rhel71-6.0.9.tgz"
+    }, {
+      "architecture" : "ppc64le",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "9.0",
+      "minOsVersion" : "8.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-ppc64le-enterprise-rhel81-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "ubuntu",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "23.04",
+      "minOsVersion" : "22.04",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-ubuntu2204-6.0.9.tgz"
+    }, {
+      "architecture" : "aarch64",
+      "bits" : 64,
+      "flavor" : "ubuntu",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "23.04",
+      "minOsVersion" : "22.04",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-ubuntu2204-6.0.9.tgz"
+    }, {
+      "architecture" : "aarch64",
+      "bits" : 64,
+      "flavor" : "ubuntu",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "21.04",
+      "minOsVersion" : "20.04",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-ubuntu2004-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "ubuntu",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "21.04",
+      "minOsVersion" : "20.04",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-ubuntu2004-6.0.9.tgz"
+    }, {
+      "architecture" : "s390x",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "9.0",
+      "minOsVersion" : "8.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-s390x-enterprise-rhel83-6.0.9.tgz"
+    }, {
+      "architecture" : "s390x",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "8.0",
+      "minOsVersion" : "7.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-s390x-enterprise-rhel72-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "suse",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "13",
+      "minOsVersion" : "12",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-suse12-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "debian",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "12.0",
+      "minOsVersion" : "11.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-debian11-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "amazon2",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "",
+      "minOsVersion" : "2",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-amazon2-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "8.0",
+      "minOsVersion" : "7.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-rhel70-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "modules" : [ "enterprise" ],
+      "platform" : "windows",
+      "url" : "https://downloads.mongodb.com/windows/mongodb-windows-x86_64-enterprise-6.0.9.zip"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "modules" : [ "enterprise" ],
+      "platform" : "osx",
+      "url" : "https://downloads.mongodb.com/osx/mongodb-macos-x86_64-enterprise-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "ubuntu",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "19.04",
+      "minOsVersion" : "18.04",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-ubuntu1804-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "suse",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "16",
+      "minOsVersion" : "15",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-suse15-6.0.9.tgz"
+    }, {
+      "architecture" : "aarch64",
+      "bits" : 64,
+      "flavor" : "ubuntu",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "19.04",
+      "minOsVersion" : "18.04",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-ubuntu1804-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "debian",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "11.0",
+      "minOsVersion" : "10.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-debian10-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "9.0",
+      "minOsVersion" : "8.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-rhel80-6.0.9.tgz"
+    }, {
+      "architecture" : "aarch64",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "9.0",
+      "minOsVersion" : "8.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-rhel82-6.0.9.tgz"
+    }, {
+      "architecture" : "aarch64",
+      "bits" : 64,
+      "flavor" : "amazon2",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "",
+      "minOsVersion" : "2",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-amazon2-6.0.9.tgz"
+    }, {
+      "architecture" : "amd64",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "10.0",
+      "minOsVersion" : "9.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-x86_64-enterprise-rhel90-6.0.9.tgz"
+    }, {
+      "architecture" : "aarch64",
+      "bits" : 64,
+      "flavor" : "rhel",
+      "gitVersion" : "90c65f9cc8fc4e6664a5848230abaa9b3f3b02f7",
+      "maxOsVersion" : "10.0",
+      "minOsVersion" : "9.0",
+      "modules" : [ "enterprise" ],
+      "platform" : "linux",
+      "url" : "https://downloads.mongodb.com/linux/mongodb-linux-aarch64-enterprise-rhel90-6.0.9.tgz"
+    } ],
+    "name" : "6.0.9-ent"
+  },
+    {
       "name": "4.2.8-ent",
       "builds": [
         {
